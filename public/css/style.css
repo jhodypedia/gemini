@@ -1,15 +1,167 @@
+/* public/css/style.css */
+/* Ocean-blue, modern UI, responsive, animations */
 :root{
   --ocean-500:#0077b6;
   --ocean-400:#00aaff;
-  --bg:#f5fbff;
+  --accent:#065a82;
+  --muted:#6c8ba4;
+  --bg:#f6fbff;
+  --card:#ffffff;
+  --glass: rgba(255,255,255,0.85);
+  --radius: 14px;
+  --shadow-1: 0 6px 20px rgba(3,19,43,0.06);
+  --shadow-2: 0 10px 30px rgba(3,19,43,0.08);
 }
-body{background:var(--bg);color:#072a40}
-.navbar-ocean{background:linear-gradient(90deg,var(--ocean-500),#005f99);}
-.text-ocean{color:var(--ocean-500)}
-.btn-ocean{background:linear-gradient(90deg,var(--ocean-400),var(--ocean-500)); color:#fff; border:none;}
-.btn-outline-ocean{border:1px solid var(--ocean-500); color:var(--ocean-500); background:transparent;}
-.card{border-radius:12px}
-#uploadPreview img{width:72px;height:72px;object-fit:cover;border-radius:8px;margin-right:8px;border:1px solid rgba(0,0,0,0.06);}
-.job-card{border-radius:10px;padding:10px;background:#fff;margin-bottom:8px;box-shadow:0 6px 18px rgba(0,0,0,0.04)}
-.result-video{width:260px;border-radius:10px;overflow:hidden;border:1px solid #e7f4ff;background:#000}
-@media(max-width:768px){ .result-video{width:100%} }
+
+/* base */
+* { box-sizing: border-box; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+html,body { height:100%; }
+body {
+  margin:0;
+  font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: linear-gradient(180deg, #f2fbff 0%, #eaf8ff 100%);
+  color:#072a40;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* container */
+.container {
+  max-width:1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* NAVBAR */
+.navbar {
+  background: linear-gradient(90deg,var(--ocean-500),#005f99);
+  padding: 10px 20px;
+  border-radius: 0 0 18px 18px;
+  box-shadow: var(--shadow-1);
+}
+.navbar .brand {
+  color: #fff;
+  font-weight:700;
+  letter-spacing:0.2px;
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+.navbar .brand .logo {
+  width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,0.12);display:inline-flex;align-items:center;justify-content:center;
+}
+.navbar .nav-actions { margin-left:auto; display:flex; gap:8px; align-items:center; }
+
+/* Buttons */
+.btn-ocean {
+  background: linear-gradient(90deg,var(--ocean-400),var(--ocean-500));
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0,122,182,0.12);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.btn-ocean:hover { transform: translateY(-3px); box-shadow: var(--shadow-2); }
+.btn-outline { background:transparent; border:1px solid rgba(7,42,64,0.08); color:var(--accent); border-radius:10px; padding:8px 12px; }
+
+/* Cards */
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow-1);
+  overflow: hidden;
+}
+.card.halo { background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.8)); border: 1px solid rgba(0,0,0,0.02); }
+
+/* Forms */
+.form-control {
+  border-radius: 10px;
+  border: 1px solid rgba(7,42,64,0.06);
+  padding: 10px 12px;
+  transition: box-shadow .12s;
+}
+.form-control:focus { box-shadow: 0 8px 28px rgba(0,122,182,0.06); outline:none; border-color: var(--ocean-500); }
+
+/* Generate page layout */
+.grid {
+  display:grid;
+  grid-template-columns: 1fr 420px;
+  gap:20px;
+}
+@media (max-width: 992px) { .grid { grid-template-columns: 1fr; } }
+
+/* Upload preview */
+.upload-preview {
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+.upload-preview img {
+  width:72px;height:72px;object-fit:cover;border-radius:8px;border:1px solid rgba(7,42,64,0.06);
+  transition: transform .12s ease;
+}
+.upload-preview img:hover { transform: scale(1.06); }
+
+/* Job card */
+.job-card {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px;
+  border-radius:10px;
+  background:linear-gradient(180deg,#fff,#fbfeff);
+  border:1px solid rgba(7,42,64,0.03);
+  box-shadow: 0 6px 18px rgba(2,20,40,0.04);
+}
+.job-meta { flex:1; }
+.job-title { font-weight:600; color:var(--accent); font-size:14px; }
+.job-sub { font-size:12px; color:var(--muted); margin-top:4px; }
+.progress-wrap { width:220px; }
+.progress {
+  height:10px;
+  background: linear-gradient(90deg, rgba(0,0,0,0.04), rgba(0,0,0,0.02));
+  border-radius: 6px;
+  overflow:hidden;
+}
+.progress > i {
+  display:block;height:100%; width:0%; background: linear-gradient(90deg,var(--ocean-400),var(--ocean-500));
+  transition: width .4s cubic-bezier(.2,.9,.2,1);
+}
+
+/* animations */
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50%{ transform: scale(1.02); opacity: .95; }
+  100%{ transform: scale(1); opacity: 1; }
+}
+.loading-dot {
+  display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--ocean-500);
+  margin-right:6px; animation: pulse 1s infinite;
+}
+
+/* Cards row */
+.stats-row { display:grid; grid-template-columns: repeat(3,1fr); gap:16px; margin-bottom:18px; }
+@media(max-width:768px){ .stats-row { grid-template-columns: repeat(1,1fr); } }
+.stat-card { display:flex; gap:12px; align-items:center; padding:16px; border-radius:12px; }
+.stat-icon { width:54px;height:54px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px; }
+.stat-title { font-size:13px;color:var(--muted); }
+.stat-value { font-size:20px;font-weight:700;color:var(--accent); }
+
+/* admin charts card tweaks */
+.card canvas { width:100% !important; height:auto !important; }
+
+/* footer small */
+.footer { text-align:center; padding:18px 0; color:var(--muted); font-size:13px; }
+
+/* subtle glass effect for mobile bottom bar */
+.bottom-fixed {
+  position:fixed;left:12px;right:12px;bottom:12px;padding:10px;border-radius:12px;background:var(--glass);backdrop-filter: blur(6px);box-shadow:var(--shadow-2);
+  display:flex;gap:8px;align-items:center;justify-content:center;z-index:999;
+}
+@media(min-width:992px){ .bottom-fixed { display:none; } }
+
+/* tiny helpers */
+.kv { display:flex;align-items:center;gap:8px; }
+.small { font-size:13px; color:var(--muted); }
