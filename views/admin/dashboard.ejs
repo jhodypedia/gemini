@@ -1,0 +1,78 @@
+<% include('../layouts/main') %>
+
+<div class="mb-3 d-flex justify-content-between align-items-center">
+  <h3>Admin Dashboard</h3>
+  <div class="small text-muted">Halo, <strong><%= user %></strong></div>
+</div>
+
+<div class="stats-row mb-3">
+  <div class="card stat-card">
+    <div class="stat-icon" style="background: linear-gradient(90deg,#00aaff,#0077b6)"><i class="fa-solid fa-users"></i></div>
+    <div>
+      <div class="stat-title">Total Users</div>
+      <div class="stat-value"><%= totalUsers %></div>
+    </div>
+  </div>
+
+  <div class="card stat-card">
+    <div class="stat-icon" style="background: linear-gradient(90deg,#00d4ff,#006bb3)"><i class="fa-solid fa-video"></i></div>
+    <div>
+      <div class="stat-title">Total Videos</div>
+      <div class="stat-value"><%= totalVideos %></div>
+    </div>
+  </div>
+
+  <div class="card stat-card">
+    <div class="stat-icon" style="background: linear-gradient(90deg,#ffd166,#ff914d)"><i class="fa-solid fa-eye"></i></div>
+    <div>
+      <div class="stat-title">Visitors</div>
+      <div class="stat-value"><%= totalVisitors %></div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="card p-3">
+      <h5>Videos (last 7 days)</h5>
+      <canvas id="chartVideos" height="120"></canvas>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card p-3">
+      <h5>New users (last 7 days)</h5>
+      <canvas id="chartUsers" height="120"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+  // data provided by server: videosPerDay, usersPerDay
+  const videosPerDay = <%- JSON.stringify(videosPerDay || []) %>;
+  const usersPerDay  = <%- JSON.stringify(usersPerDay || []) %>;
+
+  // prepare labels (days)
+  const labels = videosPerDay.map(r=> r.day || r.date);
+  const vdata = videosPerDay.map(r=> Number(r.cnt || r.count || 0));
+  const ulabels = usersPerDay.map(r=> r.day || r.date);
+  const udata = usersPerDay.map(r=> Number(r.cnt || r.count || 0));
+
+  // render charts (admin.js helper will also run, but fallback here)
+  (function(){
+    if (document.getElementById('chartVideos')) {
+      new Chart(document.getElementById('chartVideos'), {
+        type: 'line',
+        data: { labels, datasets: [{ label:'Videos/day', data: vdata, borderColor:'#0077b6', backgroundColor:'rgba(0,119,182,0.12)', fill:true, tension:0.3 }]},
+        options: { responsive:true, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true }}}
+      });
+    }
+    if (document.getElementById('chartUsers')) {
+      new Chart(document.getElementById('chartUsers'), {
+        type: 'bar',
+        data: { labels: ulabels, datasets: [{ label:'New users', data: udata, backgroundColor:'#00aaff' }]},
+        options: { responsive:true, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true }}}
+      });
+    }
+  })();
+</script>
