@@ -1,6 +1,15 @@
-:root{--bg:#0b0c10;--card:#0f1115;--accent:#6b8afd}
-body{background:linear-gradient(180deg,#05060a,#0b0c10);color:#eaeef7}
-.glass{background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.02));border-radius:12px;border:1px solid rgba(255,255,255,0.04);padding:12px}
-.navbar-brand{font-weight:700}
-.progress-bar{transition:width .3s ease}
-video{border-radius:8px;border:1px solid #111;background:#000}
+:root{
+  --ocean-500:#0077b6;
+  --ocean-400:#00aaff;
+  --bg:#f5fbff;
+}
+body{background:var(--bg);color:#072a40}
+.navbar-ocean{background:linear-gradient(90deg,var(--ocean-500),#005f99);}
+.text-ocean{color:var(--ocean-500)}
+.btn-ocean{background:linear-gradient(90deg,var(--ocean-400),var(--ocean-500)); color:#fff; border:none;}
+.btn-outline-ocean{border:1px solid var(--ocean-500); color:var(--ocean-500); background:transparent;}
+.card{border-radius:12px}
+#uploadPreview img{width:72px;height:72px;object-fit:cover;border-radius:8px;margin-right:8px;border:1px solid rgba(0,0,0,0.06);}
+.job-card{border-radius:10px;padding:10px;background:#fff;margin-bottom:8px;box-shadow:0 6px 18px rgba(0,0,0,0.04)}
+.result-video{width:260px;border-radius:10px;overflow:hidden;border:1px solid #e7f4ff;background:#000}
+@media(max-width:768px){ .result-video{width:100%} }
