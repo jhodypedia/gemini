@@ -1,0 +1,96 @@
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card p-3 glass">
+      <h5>1) Set Gemini API Key</h5>
+      <form id="form-key">
+        <div class="mb-2">
+          <input type="password" class="form-control" name="apiKey" placeholder="Masukkan Gemini API Key" required>
+        </div>
+        <button class="btn btn-primary w-100">Simpan API Key</button>
+      </form>
+
+      <hr>
+      <h6>Font (server butuh file .ttf di /fonts)</h6>
+      <select id="fontSelect" class="form-select mb-2"></select>
+      <small class="text-muted">Untuk menampilkan di video, taruh file TTF/OTF font pilihan ke folder <code>/fonts</code>.</small>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="card p-3 glass">
+      <h5>2) Upload Assets (opsional)</h5>
+      <form id="form-upload" enctype="multipart/form-data">
+        <div class="mb-2">
+          <input type="file" name="images" multiple accept="image/*" class="form-control">
+        </div>
+        <div class="mb-2">
+          <input type="file" name="audio" accept="audio/*" class="form-control">
+        </div>
+        <button class="btn btn-outline-primary">Upload</button>
+      </form>
+
+      <hr>
+      <h5>3) Generate</h5>
+      <form id="form-generate" enctype="multipart/form-data">
+        <div class="mb-2">
+          <textarea name="prompt" class="form-control" placeholder="Masukkan prompt topik..." rows="2"></textarea>
+        </div>
+
+        <div class="row g-2 mb-2">
+          <div class="col">
+            <select name="preset" class="form-select">
+              <option value="reel">Reel / Shorts (1080×1920)</option>
+              <option value="landscape">Landscape (1920×1080)</option>
+              <option value="square">Square (1080×1080)</option>
+            </select>
+          </div>
+          <div class="col">
+            <input name="total" type="number" class="form-control" value="3" min="1" max="30">
+          </div>
+          <div class="col">
+            <input name="duration" type="number" class="form-control" value="10" min="4" max="120">
+          </div>
+        </div>
+
+        <div class="row g-2 mb-2">
+          <div class="col">
+            <select id="pos" name="position" class="form-select">
+              <option value="top">Top</option>
+              <option value="middle" selected>Middle</option>
+              <option value="bottom">Bottom</option>
+            </select>
+          </div>
+          <div class="col">
+            <input name="fontSize" class="form-control" value="36" />
+          </div>
+          <div class="col">
+            <label class="form-check">
+              <input type="checkbox" name="kenburns" class="form-check-input" checked> Ken Burns
+            </label>
+          </div>
+          <div class="col">
+            <label class="form-check">
+              <input type="checkbox" name="fade" class="form-check-input" checked> Fade
+            </label>
+          </div>
+        </div>
+
+        <input type="hidden" name="fontName" id="fontName">
+        <input type="hidden" name="imagesJson" id="imagesJson">
+        <input type="hidden" name="audioUrl" id="audioUrl">
+
+        <button class="btn btn-success w-100">Generate</button>
+      </form>
+
+      <div id="progress-area" class="mt-3"></div>
+      <div id="result-area" class="mt-3"></div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card p-3 glass">
+      <h5>Recent generated</h5>
+      <div id="latest"></div>
+    </div>
+  </div>
+</div>
