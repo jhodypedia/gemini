@@ -8,7 +8,7 @@ function wrapText(text, maxChars=40){
     else { if(cur) lines.push(cur); cur = w; }
   }
   if(cur) lines.push(cur);
-  return lines.join("\\n");
+  return lines.join('\\n');
 }
 function sanitizeForDrawtext(text){
   return (text||"").replace(/:/g,"\\:").replace(/'/g,"\\'").replace(/"/g,'\\"').replace(/\[/g,"\\[").replace(/\]/g,"\\]");
