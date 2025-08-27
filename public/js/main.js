@@ -1,135 +1,120 @@
 // public/js/main.js
-$(async function(){
-  const keyStatus = $("#key-status");
-  const fontSelect = $("#fontSelect");
-  const fontNameInput = $("#fontName");
-  const imagesJsonInput = $("#imagesJson");
-  const audioUrlInput = $("#audioUrl");
-  const progressArea = $("#progress-area");
-  const resultArea = $("#result-area");
-  const latestArea = $("#latest");
+document.addEventListener("DOMContentLoaded", ()=> {
+  const formKey = document.getElementById("formKey");
+  const formUpload = document.getElementById("formUpload");
+  const formGenerate = document.getElementById("formGenerate");
+  const uploadPreview = document.getElementById("uploadPreview");
+  const imagesJsonInput = document.getElementById("imagesJson");
+  const audioUrlInput = document.getElementById("audioUrl");
+  const jobsDiv = document.getElementById("jobs");
+  const resultsDiv = document.getElementById("results");
+  const btnLatest = document.getElementById("btnLatest");
 
-  // get session info
-  async function me() {
-    const r = await fetch("/api/me");
-    return await r.json();
-  }
-
-  // init
-  const m = await me();
-  keyStatus.removeClass("bg-secondary").addClass(m.hasKey ? "bg-success" : "bg-danger").text(m.hasKey ? "API key OK" : "API key belum diset");
-
-  // open websocket and say hello with sessionId
-  const sessionId = m.sessionId;
-  const ws = new WebSocket((location.protocol === "https:" ? "wss://" : "ws://") + location.host.replace(/:\d+$/,'') + ":" + (location.port || 80) + (":") + (location.port || 80) );
-  // NOTE: previous server's ws uses same port as http server, but our server.js attaches ws to same http server
-  // proper ws URL:
-  const wsUrl = (location.protocol === "https:" ? "wss://" : "ws://") + location.host;
-  const socket = new WebSocket(wsUrl);
-  socket.addEventListener("open", ()=> {
-    socket.send(JSON.stringify({ type: "hello", sessionId }));
+  // websocket connect
+  const proto = (location.protocol === "https:") ? "wss" : "ws";
+  const ws = new WebSocket(`${proto}://${location.host}`);
+  ws.addEventListener("open", ()=> {
+    // tell server our sessionId
+    fetch("/api/me").then(r=>r.json()).then(j=>{
+      if (j.sessionId) ws.send(JSON.stringify({ type:"hello", sessionId: j.sessionId }));
+    });
   });
-  socket.addEventListener("message", (ev) => {
+  ws.addEventListener("message", ev=>{
     try {
       const data = JSON.parse(ev.data);
       const id = data.videoId;
-      // render progress widget
-      let el = $(`#job-${id}`);
-      if (!el.length) {
-        el = $(`<div id="job-${id}" class="mb-2"><strong>${id}</strong> — <span class="small text-muted">${data.message||data.status}</span><div class="progress mt-1"><div class="progress-bar" role="progressbar" style="width:0%">0%</div></div></div>`);
-        progressArea.prepend(el);
+      let el = document.getElementById(`job-${id}`);
+      if (!el) {
+        el = document.createElement("div");
+        el.id = `job-${id}`;
+        el.className = "job-card";
+        el.innerHTML = `<div class="d-flex justify-content-between align-items-center"><strong>${id.slice(0,8)}</strong><small class="text-muted job-msg">queued</small></div>
+          <div class="progress mt-2"><div class="progress-bar" style="width:0%">0%</div></div>`;
+        jobsDiv.prepend(el);
       }
-      el.find(".small").text(data.message || data.status || "");
-      el.find(".progress-bar").css("width", (data.progress||0) + "%").text((data.progress||0) + "%");
+      el.querySelector(".job-msg").innerText = data.message || data.status || "working";
+      const bar = el.querySelector(".progress-bar");
+      bar.style.width = (data.progress||0) + "%";
+      bar.innerText = (data.progress||0) + "%";
+
       if (data.status === "done" && data.output) {
-        // add to results
-        resultArea.prepend(`<div class="mb-2"><a href="${data.output}" target="_blank">${data.output}</a></div>`);
-        loadLatest();
+        const card = document.createElement("div");
+        card.className = "result-video";
+        card.innerHTML = `<video controls width="100%"><source src="${data.output}" type="video/mp4"></video>`;
+        resultsDiv.prepend(card);
+        Swal.fire({ icon:"success", title: "Selesai", toast:true, timer:1500, position:"top-end", showConfirmButton:false });
+      }
+      if (data.status === "error") {
+        Swal.fire({ icon:"error", title: "Error", text: data.message || "Rendering failed" });
       }
     } catch(e){}
   });
 
-  // load fonts list
-  async function loadFonts() {
-    try {
-      const r = await fetch("/api/fonts");
-      const j = await r.json();
-      const list = (j.fonts || []);
-      fontSelect.empty();
-      list.forEach(f => {
-        fontSelect.append(`<option value="${f}">${f}</option>`);
-      });
-    } catch(e){
-      // fallback list
-      ["Roboto","Inter","Poppins","Montserrat","Lato","Open Sans"].forEach(f=> fontSelect.append(`<option value="${f}">${f}</option>`));
-    }
-  }
-  await loadFonts();
-
-  // key form
-  $("#form-key").on("submit", async function(e){
+  // set key
+  formKey?.addEventListener("submit", async e=>{
     e.preventDefault();
-    const fd = new FormData(this);
-    const r = await fetch("/api/set-key",{method:"POST",body:fd});
+    const apiKey = e.target.apiKey.value.trim();
+    if (!apiKey) return Swal.fire({ icon:"warning", title:"API Key kosong" });
+    const r = await fetch("/api/set-key", { method:"POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ apiKey }) });
     const j = await r.json();
-    if (j.success) {
-      toastr.success("API key tersimpan");
-      keyStatus.removeClass("bg-danger").addClass("bg-success").text("API key OK");
-    } else toastr.error(j.message || "Gagal");
+    if (j.success) Swal.fire({ icon:"success", title:"API Key tersimpan" }); else Swal.fire({ icon:"error", title:"Gagal menyimpan" });
   });
 
   // upload form
-  $("#form-upload").on("submit", async function(e){
+  formUpload?.addEventListener("submit", async e=>{
     e.preventDefault();
-    const fd = new FormData(this);
-    const r = await fetch("/api/upload", { method:"POST", body:fd });
+    const fd = new FormData(formUpload);
+    const r = await fetch("/api/upload", { method:"POST", body: fd });
     const j = await r.json();
-    if (!j.success) return toastr.error("Upload gagal");
-    // set hidden fields
-    imagesJsonInput.val(JSON.stringify(j.images || []));
-    audioUrlInput.val(j.audio || "");
-    toastr.success("Upload berhasil");
+    if (!j.success) return Swal.fire({ icon:"error", title:"Upload gagal" });
+    imagesJsonInput.value = JSON.stringify(j.images || []);
+    audioUrlInput.value = j.audio || "";
+    uploadPreview.innerHTML = "";
+    (j.images || []).forEach(u=>{
+      const img = document.createElement("img"); img.src = u; uploadPreview.appendChild(img);
+    });
+    if (j.audio) {
+      const a = document.createElement("audio"); a.controls = true; a.src = j.audio; a.className="w-100 mt-2"; uploadPreview.appendChild(a);
+    }
+    Swal.fire({ icon:"success", title:"Upload berhasil" });
   });
-
-  // when font select changes, set hidden input
-  fontSelect.on("change", ()=> {
-    $("#fontName").val(fontSelect.val());
-  });
-  // init hidden value
-  $("#fontName").val(fontSelect.val());
 
   // generate form
-  $("#form-generate").on("submit", async function(e){
+  formGenerate?.addEventListener("submit", async e=>{
     e.preventDefault();
-    resultArea.empty();
-    progressArea.empty();
-    const form = this;
-    const fd = new FormData(form);
-    // append hidden fields (imagesJson, audioUrl, fontName already set)
-    // send request
-    const r = await fetch("/api/generate", { method:"POST", body:fd });
+    const confirm = await Swal.fire({ title: "Konfirmasi", html: `Generate <b>${e.target.total.value}</b> video sekarang?`, showCancelButton:true });
+    if (!confirm.isConfirmed) return;
+    const fd = new FormData(formGenerate);
+    fd.set("imagesJson", imagesJsonInput.value || "[]");
+    fd.set("audioUrl", audioUrlInput.value || "");
+    const r = await fetch("/api/generate", { method:"POST", body: fd });
     const j = await r.json();
-    if (!j.success) {
-      toastr.error(j.message || "Gagal mengenerate");
-      return;
-    }
-    toastr.info(`Job dimulai: ${j.jobIds?.length||0} job`);
-    // show jobs
-    (j.jobIds || []).forEach(id => {
-      progressArea.prepend(`<div id="job-${id}" class="mb-2"><strong>${id}</strong> — <span class="small text-muted">queued</span><div class="progress mt-1"><div class="progress-bar" role="progressbar" style="width:0%">0%</div></div></div>`);
+    if (!j.success) return Swal.fire({ icon:"error", title:"Gagal memulai job", text: j.message || "" });
+    Swal.fire({ icon:"info", title:"Job dimulai", text: `Membuat ${j.jobIds.length} video — cek progress.` });
+    // place holder job cards
+    j.jobIds.forEach(id => {
+      if (!document.getElementById(`job-${id}`)) {
+        const el = document.createElement("div"); el.id = `job-${id}`; el.className = "job-card";
+        el.innerHTML = `<div class="d-flex justify-content-between align-items-center"><strong>${id.slice(0,8)}</strong><small class="text-muted">queued</small></div>
+          <div class="progress mt-2"><div class="progress-bar" style="width:0%">0%</div></div>`;
+        jobsDiv.prepend(el);
+      }
     });
   });
 
   // load latest
-  async function loadLatest() {
+  async function loadLatest(){
     try {
-      const r = await fetch("/api/videos");
-      const j = await r.json();
-      latestArea.empty();
-      (j.files||[]).slice(0,8).forEach(f => {
-        latestArea.append(`<video controls width="240" class="m-1"><source src="${f}" type="video/mp4"></video>`);
+      const r = await fetch("/api/videos"); const j = await r.json();
+      if (!j.success) return;
+      resultsDiv.innerHTML = "";
+      (j.files || []).slice(0,12).forEach(f => {
+        const el = document.createElement("div"); el.className = "result-video";
+        el.innerHTML = `<video controls width="100%"><source src="${f}" type="video/mp4"></video>`;
+        resultsDiv.appendChild(el);
       });
     } catch(e){}
   }
+  btnLatest?.addEventListener("click", loadLatest);
   loadLatest();
 });
