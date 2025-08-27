@@ -1,0 +1,35 @@
+<% include('../layouts/main') %>
+
+<div class="row justify-content-center">
+  <div class="col-md-7">
+    <div class="card p-4 halo">
+      <h3 class="mb-3">Daftar Akun</h3>
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger"><%= error %></div>
+      <% } %>
+      <form method="post" action="/auth/register">
+        <div class="row g-2">
+          <div class="col-md-6 mb-2">
+            <label class="form-label small">Username</label>
+            <input name="username" class="form-control" required>
+          </div>
+          <div class="col-md-6 mb-2">
+            <label class="form-label small">Email</label>
+            <input name="email" type="email" class="form-control" required>
+          </div>
+        </div>
+        <div class="mb-2">
+          <label class="form-label small">Password</label>
+          <input name="password" type="password" class="form-control" required>
+        </div>
+        <div class="d-grid">
+          <button class="btn-ocean" type="submit"><i class="fa-solid fa-user-plus"></i> Daftar</button>
+        </div>
+      </form>
+
+      <div class="mt-3 text-center small">
+        Sudah punya akun? <a href="/auth/login">Masuk</a>
+      </div>
+    </div>
+  </div>
+</div>
