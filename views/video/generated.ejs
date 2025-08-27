@@ -1,0 +1,32 @@
+<% include('../layouts/main') %>
+
+<div class="mb-3 d-flex justify-content-between align-items-center">
+  <h4>Your Generated Videos</h4>
+  <a class="btn btn-outline" href="/generate-video"><i class="fa-solid fa-plus"></i> New</a>
+</div>
+
+<% if (!videos || videos.length === 0) { %>
+  <div class="card p-4 halo">
+    <p class="small text-muted">Belum ada video. Buat video pertama kamu di <a href="/generate-video">Generate Video</a>.</p>
+  </div>
+<% } else { %>
+  <div class="row g-3">
+    <% videos.forEach(v => { %>
+      <div class="col-md-4">
+        <div class="card">
+          <div style="background:#000;height:220px;display:flex;align-items:center;justify-content:center;">
+            <video controls style="max-width:100%; max-height:100%;" src="<%= v.videoUrl %>"></video>
+          </div>
+          <div class="card-body">
+            <div class="small text-muted mb-1"><%= (new Date(v.createdAt)).toLocaleString() %></div>
+            <div class="mb-2"><strong>Prompt:</strong> <%= v.prompt.length > 120 ? v.prompt.slice(0,120)+'...' : v.prompt %></div>
+            <div class="d-flex gap-2">
+              <a class="btn btn-sm btn-primary" href="<%= v.videoUrl %>" download><i class="fa-solid fa-download"></i> Download</a>
+              <a class="btn btn-sm btn-outline" href="<%= v.videoUrl %>" target="_blank"><i class="fa-solid fa-eye"></i> View</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+<% } %>
