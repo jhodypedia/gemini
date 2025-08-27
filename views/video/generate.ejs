@@ -1,0 +1,94 @@
+<% include('../layouts/main') %>
+
+<div class="grid">
+  <!-- left: form -->
+  <div>
+    <div class="card halo">
+      <h4>🎬 Generate Video</h4>
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger"><%= error %></div>
+      <% } %>
+
+      <form id="generateForm" method="post" action="/generate-video" enctype="multipart/form-data">
+        <div class="mb-2">
+          <label class="form-label small">Prompt (masukan murni dari user)</label>
+          <textarea name="prompt" class="form-control" rows="4" placeholder="Contoh: 5 tips produktif bekerja dari rumah" required></textarea>
+        </div>
+
+        <div class="mb-2">
+          <label class="form-label small">Upload Images (opsional)</label>
+          <input type="file" name="images" accept="image/*" multiple class="form-control">
+          <div class="upload-preview mt-2"></div>
+        </div>
+
+        <div class="row g-2">
+          <div class="col-md-6 mb-2">
+            <label class="form-label small">Size</label>
+            <select name="size" class="form-control">
+              <option value="reels">Reels (9:16)</option>
+              <option value="landscape">Landscape (16:9)</option>
+              <option value="square">Square (1:1)</option>
+            </select>
+          </div>
+
+          <div class="col-md-3 mb-2">
+            <label class="form-label small">Duration (s)</label>
+            <input name="duration" type="number" class="form-control" value="8" min="4" max="60">
+          </div>
+
+          <div class="col-md-3 mb-2">
+            <label class="form-label small">Preset</label>
+            <select name="preset" class="form-control">
+              <option value="default">Default</option>
+              <option value="fast">Fast</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-check form-switch my-2">
+          <input class="form-check-input" name="kenburns" type="checkbox" id="kb" checked>
+          <label class="form-check-label small" for="kb">Ken Burns</label>
+        </div>
+
+        <div class="form-check form-switch my-2">
+          <input class="form-check-input" name="fade" type="checkbox" id="fade" checked>
+          <label class="form-check-label small" for="fade">Fade</label>
+        </div>
+
+        <div class="d-grid mt-3">
+          <button type="submit" class="btn-ocean"><i class="fa-solid fa-rocket"></i> Generate</button>
+        </div>
+      </form>
+
+      <div class="mt-3 small text-muted">
+        Tip: Pastikan user sudah memasukkan API key di <a href="/set-apikey">Set API Key</a> bila ingin hasil naskah/video dari Gemini.
+      </div>
+    </div>
+  </div>
+
+  <!-- right: progress & info -->
+  <aside>
+    <div class="card halo">
+      <h5>Progress</h5>
+      <div id="jobs" class="mt-2">
+        <!-- job cards akan muncul via main.js -->
+      </div>
+
+      <hr/>
+
+      <h6>Upload Preview</h6>
+      <div class="upload-preview"></div>
+    </div>
+
+    <div class="card halo mt-3">
+      <h6>Recent Results</h6>
+      <div id="recentResults" class="mt-2 small text-muted">Hasil akan muncul di halaman <a href="/generated-video">Generated Videos</a>.</div>
+    </div>
+  </aside>
+</div>
+
+<!-- mobile bottom quick actions -->
+<div class="bottom-fixed d-lg-none">
+  <button class="btn-ocean" data-action="generate"><i class="fa-solid fa-video"></i> Generate</button>
+  <button class="btn btn-outline" data-action="my"><i class="fa-solid fa-layer-group"></i> My Videos</button>
+</div>
